@@ -3,13 +3,16 @@ import {
 	RouterProvider,
 	Navigate,
 } from "react-router-dom";
+import { EmptyState } from "./compositions/empty-state";
+import { TbError404 } from "react-icons/tb";
+import type { ReactNode } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { useAuthStore } from "./store/auth";
+import { HomePage } from "./pages/HomePAge";
+import { useAuth } from "./store/auth";
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-	const { isLoggedIn } = useAuthStore();
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+	const { isLoggedIn } = useAuth();
 	if (!isLoggedIn) {
 		return <Navigate to="/login" />;
 	}
@@ -26,16 +29,22 @@ const router = createBrowserRouter([
 		element: <RegisterPage />,
 	},
 	{
-		path: "/dashboard",
+		path: "/home",
 		element: (
 			<ProtectedRoute>
-				<DashboardPage />
+				<HomePage />
 			</ProtectedRoute>
 		),
 	},
 	{
 		path: "*",
-		element: <Navigate to="/login" />,
+		element: (
+			<EmptyState
+				title="Error"
+				description="Não encontrou a rota"
+				icon={<TbError404 />}
+			/>
+		),
 	},
 ]);
 
