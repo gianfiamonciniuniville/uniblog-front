@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { Box, Heading } from "@chakra-ui/react";
 import BlogForm from "../compositions/BlogForm";
@@ -14,9 +15,8 @@ const BlogCreatePage: React.FC = () => {
 
 	const handleSubmit = async (data: BlogCreateDto | BlogUpdateDto) => {
 		if (!user?.id) {
-			toaster.error("User not authenticated or user ID not found.");
+			toaster.error({ title: "User not authenticated or user ID not found." });
 			return;
-			s;
 		}
 		setDisabled(true);
 		try {
@@ -26,10 +26,10 @@ const BlogCreatePage: React.FC = () => {
 				userId: user.id,
 			};
 			await createBlog(createData);
-			toaster.success("Blog created successfully!");
+			toaster.success({ title: "Blog created successfully!" });
 			navigate("/blogs");
 		} catch (err: any) {
-			toaster.error(err.message || "Failed to create blog.");
+			toaster.error({ title: err.message || "Failed to create blog." });
 		} finally {
 			setDisabled(false);
 		}

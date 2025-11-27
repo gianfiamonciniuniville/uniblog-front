@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/AuthorPostListPage.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -22,7 +23,7 @@ const AuthorPostListPage: React.FC = () => {
 	useEffect(() => {
 		const fetchAuthorAndPosts = async () => {
 			if (isNaN(parsedAuthorId)) {
-				toaster.error("Invalid Author ID."); // Use toaster
+				toaster.error({ title: { title: "Invalid Author ID." } });
 				setDisabled(false);
 				return;
 			}
@@ -34,7 +35,9 @@ const AuthorPostListPage: React.FC = () => {
 				setPosts(postsData);
 				setAuthor(authorData);
 			} catch (err: any) {
-				toaster.error(err.message || "Failed to fetch author's posts."); // Use toaster
+				toaster.error({
+					title: err.message || "Failed to fetch author's posts.",
+				});
 			} finally {
 				setDisabled(false);
 			}
@@ -44,24 +47,24 @@ const AuthorPostListPage: React.FC = () => {
 
 	const handleDeletePost = async (postIdToDelete: number) => {
 		if (!isLoggedIn || currentUser?.id !== parsedAuthorId) {
-			toaster.error("You are not authorized to delete this post."); // Use toaster
+			toaster.error({ title: "You are not authorized to delete this post." });
 			return;
 		}
 
 		if (window.confirm("Are you sure you want to delete this post?")) {
 			try {
 				await deletePost(postIdToDelete);
-				toaster.success("Post deleted successfully!"); // Use toaster
+				toaster.success({ title: "Post deleted successfully!" });
 				setPosts(posts.filter((post) => post.id !== postIdToDelete));
 			} catch (err: any) {
-				toaster.error(err.message || "Failed to delete post."); // Use toaster
+				toaster.error({ title: err.message || "Failed to delete post." });
 			}
 		}
 	};
 
 	const handleEditPost = (postIdToEdit: number) => {
 		if (!isLoggedIn || currentUser?.id !== parsedAuthorId) {
-			toaster.error("You are not authorized to edit this post."); // Use toaster
+			toaster.error({ title: "You are not authorized to edit this post." });
 			return;
 		}
 		const postToEdit = posts.find((p) => p.id === postIdToEdit);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/BlogListPage.tsx
 import React, { useEffect, useState } from "react";
 import type { Blog } from "../types/api";
@@ -22,7 +23,7 @@ const BlogListPage: React.FC = () => {
 				const data = await getAllBlogs();
 				setBlogs(data);
 			} catch (err: any) {
-				toaster.error(err.message || "Failed to fetch blogs."); // Use toaster
+				toaster.error({ title: err.message || "Failed to fetch blogs." });
 			} finally {
 				setDisabled(false);
 			}
@@ -39,17 +40,17 @@ const BlogListPage: React.FC = () => {
 			!isLoggedIn ||
 			user?.id !== blogs.find((blog) => blog.id === id)?.userId
 		) {
-			toaster.error("You are not authorized to delete this blog.");
+			toaster.error({ title: "You are not authorized to delete this blog." });
 			return;
 		}
 
 		if (window.confirm("Are you sure you want to delete this blog?")) {
 			try {
 				await deleteBlog(id);
-				toaster.success("Blog deleted successfully!");
+				toaster.success({ title: "Blog deleted successfully!" });
 				setBlogs(blogs.filter((blog) => blog.id !== id));
 			} catch (err: any) {
-				toaster.error(err.message || "Failed to delete blog.");
+				toaster.error({ title: err.message || "Failed to delete blog." });
 			}
 		}
 	};

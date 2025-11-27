@@ -1,6 +1,3 @@
-import { post } from "./../use-cases/api-client";
-// src/types/api.ts
-
 export interface BlogCreateDto {
 	title?: string | null;
 	description?: string | null;
@@ -53,7 +50,6 @@ export interface UpdateUserProfileDto {
 	profileImageUrl?: string | null;
 }
 
-// User types
 export interface UserShortDto {
 	id: number;
 	userName: string;
@@ -65,7 +61,7 @@ export interface UserDto {
 	email: string;
 	profileImageUrl?: string | null;
 	bio?: string | null;
-	role: string; // Assuming 'role' is a property from the backend
+	role: string;
 }
 
 export interface AuthResponseDto {
@@ -79,25 +75,20 @@ export interface Blog {
 	title: string;
 	description: string;
 	userId: number;
-	// Add other blog properties if they come from the API
 }
 
-// Comment types
 export interface CommentDto {
 	id: number;
 	content: string;
-	postId: number; // Added postId to CommentDto for clarity
+	postId: number;
 	user: UserShortDto;
-	// Add other comment properties
 }
 
-// Like types
 export interface LikeDto {
 	id: number;
 	user: UserShortDto;
 }
 
-// Post types - Updated to include comments and likes
 export interface Post {
 	id: number;
 	title: string;
@@ -105,7 +96,6 @@ export interface Post {
 	slug: string;
 	authorId: number;
 	blogId: number;
-	comments: CommentDto[]; // Assuming post includes its comments
-	likes: LikeDto[]; // Assuming post includes its likes
-	// Add other post properties
+	comments: CommentDto[];
+	likes: LikeDto[];
 }
