@@ -27,7 +27,9 @@ const PostForm: React.FC<PostFormProps> = ({
 	const [title, setTitle] = useState(initialData?.title || "");
 	const [content, setContent] = useState(initialData?.content || "");
 	const [slug, setSlug] = useState(initialData?.slug || "");
-	const [blogId, setBlogId] = useState<number | undefined>(initialData?.blogId);
+	const [blogId, setBlogId] = useState<number | undefined>(
+		initialData?.blog.id
+	);
 	const [blogs, setBlogs] = useState<Blog[]>([]);
 	const [fetchingBlogs, setFetchingBlogs] = useState(true);
 	const [blogFetchError, setBlogFetchError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ const PostForm: React.FC<PostFormProps> = ({
 			setTitle(initialData.title);
 			setContent(initialData.content);
 			setSlug(initialData.slug);
-			setBlogId(initialData.blogId);
+			setBlogId(initialData.blog.id);
 		}
 	}, [initialData]);
 

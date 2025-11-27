@@ -94,8 +94,16 @@ export interface Post {
 	title: string;
 	content: string;
 	slug: string;
-	authorId: number;
-	blogId: number;
+	published: boolean;
+	publishedAt: Date | null;
+	viewCount: number;
+	blog: BlogShortDto;
 	comments: CommentDto[];
 	likes: LikeDto[];
+	author: UserShortDto;
+}
+
+export interface BlogShortDto {
+	id: number;
+	title: string;
 }

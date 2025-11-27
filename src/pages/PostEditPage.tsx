@@ -28,7 +28,7 @@ const PostEditPage: React.FC = () => {
 			try {
 				const data = await getPostById(postId);
 
-				if (user && data.authorId === user.id) {
+				if (user && data.author.id === user.id) {
 					setInitialData(data);
 				} else {
 					toaster.error({ title: "You are not authorized to edit this post." });

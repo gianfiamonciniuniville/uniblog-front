@@ -133,18 +133,12 @@ const PostDetailPage: React.FC = () => {
 				</Heading>
 				<Text fontSize="md" color="gray.500">
 					By{" "}
-					<ChakraLink
-						as={RouterLink}
-						href={`/profile/${post.authorId}`}
-						color="blue.500">
-						{post.authorId}
+					<ChakraLink href={`/profile/${post.author.id}`} color="blue.500">
+						{post.author.userName}
 					</ChakraLink>{" "}
 					in{" "}
-					<ChakraLink
-						as={RouterLink}
-						href={`/blogs/${post.blogId}`}
-						color="blue.500">
-						{post.blogId}
+					<ChakraLink href={`/blogs/${post.blog.id}`} color="blue.500">
+						{post.blog.title}
 					</ChakraLink>
 				</Text>
 				<Text
