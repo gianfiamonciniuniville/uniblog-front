@@ -15,7 +15,6 @@ export const getAllPosts = async () => {
 // New function: getPostById
 export const getPostById = async (id: number) => {
 	try {
-		// Since there's no direct API for /Post/{id} GET, we fetch all and filter
 		const allPosts = await getAllPosts();
 		const post = allPosts.find((p) => p.id === id);
 		if (!post) {

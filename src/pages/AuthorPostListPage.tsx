@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/AuthorPostListPage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react"; // Added useMemo
 import { useParams, useNavigate } from "react-router-dom";
 import type { Post, UserDto } from "../types/api";
 import { getPostsByAuthor, deletePost } from "../use-cases/post-cases";
 import { getUserById } from "../use-cases/user-cases";
-import { Box, Heading, SimpleGrid } from "@chakra-ui/react";
+import { Box, Heading, SimpleGrid, RadioGroup, HStack } from "@chakra-ui/react"; // Added RadioGroup, Stack, Radio
 import PostCard from "../compositions/PostCard";
 import { useAuth } from "../store/auth";
 import { toaster } from "../compositions/toaster"; // Import the toaster
@@ -14,11 +14,22 @@ import { EmptyState } from "../compositions/empty-state"; // Import EmptyState
 const AuthorPostListPage: React.FC = () => {
 	const { authorId } = useParams<{ authorId: string }>();
 	const parsedAuthorId = Number(authorId);
-	const [posts, setPosts] = useState<Post[]>([]);
+	const [allPosts, setAllPosts] = useState<Post[]>([]); // Renamed to allPosts
 	const [author, setAuthor] = useState<UserDto | null>(null);
 	const [disabled, setDisabled] = useState(true);
+	const [filterStatus, setFilterStatus] = useState<
+		"all" | "published" | "unpublished"
+	>("all"); // New state for filter
 	const navigate = useNavigate();
 	const { user: currentUser, isLoggedIn } = useAuth();
+
+	const handlePostStatusChange = (postId: number, isPublished: boolean) => {
+		setAllPosts((prevPosts) =>
+			prevPosts.map((post) =>
+				post.id === postId ? { ...post, isPublished } : post
+			)
+		);
+	};
 
 	useEffect(() => {
 		const fetchAuthorAndPosts = async () => {
@@ -29,10 +40,10 @@ const AuthorPostListPage: React.FC = () => {
 			}
 			try {
 				const [postsData, authorData] = await Promise.all([
-					getPostsByAuthor(parsedAuthorId),
+					getPostsByAuthor(parsedAuthorId), // Removed isPublishedFilter
 					getUserById(parsedAuthorId),
 				]);
-				setPosts(postsData);
+				setAllPosts(postsData); // Set allPosts
 				setAuthor(authorData);
 			} catch (err: any) {
 				toaster.error({
@@ -43,7 +54,17 @@ const AuthorPostListPage: React.FC = () => {
 			}
 		};
 		fetchAuthorAndPosts();
-	}, [parsedAuthorId]);
+	}, [parsedAuthorId]); // Removed filterStatus from dependency array
+
+	const filteredPosts = useMemo(() => {
+		if (filterStatus === "all") {
+			return allPosts;
+		} else if (filterStatus === "published") {
+			return allPosts.filter((post) => post.published);
+		} else {
+			return allPosts.filter((post) => !post.published);
+		}
+	}, [allPosts, filterStatus]);
 
 	const handleDeletePost = async (postIdToDelete: number) => {
 		if (!isLoggedIn || currentUser?.id !== parsedAuthorId) {
@@ -55,7 +76,7 @@ const AuthorPostListPage: React.FC = () => {
 			try {
 				await deletePost(postIdToDelete);
 				toaster.success({ title: "Post deleted successfully!" });
-				setPosts(posts.filter((post) => post.id !== postIdToDelete));
+				setAllPosts(allPosts.filter((post) => post.id !== postIdToDelete)); // Filter from allPosts
 			} catch (err: any) {
 				toaster.error({ title: err.message || "Failed to delete post." });
 			}
@@ -67,7 +88,7 @@ const AuthorPostListPage: React.FC = () => {
 			toaster.error({ title: "You are not authorized to edit this post." });
 			return;
 		}
-		const postToEdit = posts.find((p) => p.id === postIdToEdit);
+		const postToEdit = allPosts.find((p) => p.id === postIdToEdit); // Find from allPosts
 		if (postToEdit) {
 			navigate(`/posts/edit/${postToEdit.id}`);
 		}
@@ -96,13 +117,32 @@ const AuthorPostListPage: React.FC = () => {
 			<Heading as="h1" size="xl" mb={6}>
 				Posts by {author.userName}
 			</Heading>
-			{posts.length > 0 ? (
+			<RadioGroup.Root
+				value={filterStatus}
+				onValueChange={(e) => setFilterStatus(e.value as any)}>
+				<HStack gap={6}>
+					{[
+						{ value: "all", label: "All" },
+						{ value: "published", label: "Published" },
+						{ value: "unpublished", label: "Unpublished" },
+					].map((item) => (
+						<RadioGroup.Item key={item.value} value={item.value}>
+							<RadioGroup.ItemHiddenInput />
+							<RadioGroup.ItemIndicator />
+							<RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
+						</RadioGroup.Item>
+					))}
+				</HStack>
+			</RadioGroup.Root>
+
+			{filteredPosts.length > 0 ? (
 				<SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} gap={6}>
-					{posts.map((post) => (
+					{filteredPosts.map((post) => (
 						<PostCard
 							key={post.id}
 							post={post}
 							showAuthor={false}
+							onPostStatusChange={handlePostStatusChange} // Added prop
 							onEdit={
 								isLoggedIn && currentUser?.id === parsedAuthorId
 									? handleEditPost

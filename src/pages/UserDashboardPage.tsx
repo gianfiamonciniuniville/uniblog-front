@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
-import { Heading, VStack, Box, SimpleGrid, Flex } from "@chakra-ui/react";
+import React, { useEffect, useState, useMemo } from "react"; // Added useMemo
+import {
+	Heading,
+	VStack,
+	Box,
+	SimpleGrid,
+	Flex,
+	RadioGroup,
+	HStack,
+} from "@chakra-ui/react"; // Added RadioGroup, Stack, Radio
 import { useAuth } from "../store/auth";
 import { getAllPosts } from "../use-cases/post-cases"; // Changed import
 import { getAllBlogs } from "../use-cases/blog-cases";
@@ -19,6 +27,17 @@ const UserDashboardPage: React.FC = () => {
 	const [allBlogs, setAllBlogs] = useState<Blog[]>([]); // Changed state variable name
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [filterStatus, setFilterStatus] = useState<
+		"all" | "published" | "unpublished"
+	>("all"); // New state for filter
+
+	const handlePostStatusChange = (postId: number, isPublished: boolean) => {
+		setAllPosts((prevPosts) =>
+			prevPosts.map((post) =>
+				post.id === postId ? { ...post, isPublished } : post
+			)
+		);
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -30,8 +49,9 @@ const UserDashboardPage: React.FC = () => {
 
 			try {
 				setLoading(true);
-				const [postsData, blogsData] = await Promise.all([ // Changed variable name
-					getAllPosts(), // Changed function call
+				const [postsData, blogsData] = await Promise.all([
+					// Changed variable name
+					getAllPosts(), // Removed isPublishedFilter
 					getAllBlogs(),
 				]);
 				setAllPosts(postsData); // Changed state setter
@@ -44,7 +64,17 @@ const UserDashboardPage: React.FC = () => {
 			}
 		};
 		fetchData();
-	}, [user]);
+	}, [user]); // Removed filterStatus from dependency array
+
+	const filteredPosts = useMemo(() => {
+		if (filterStatus === "all") {
+			return allPosts;
+		} else if (filterStatus === "published") {
+			return allPosts.filter((post) => post.published);
+		} else {
+			return allPosts.filter((post) => !post.published);
+		}
+	}, [allPosts, filterStatus]);
 
 	if (loading) {
 		return (
@@ -84,14 +114,38 @@ const UserDashboardPage: React.FC = () => {
 							Create New Post
 						</Button>
 					</Flex>
-					{allPosts.length > 0 ? ( // Changed state variable name
-						<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-							{allPosts.map((post) => ( // Changed state variable name
-								<PostCard
-									key={post.id}
-									post={post}
-								/>
+
+					<RadioGroup.Root
+						value={filterStatus}
+						onValueChange={(e) => setFilterStatus(e.value as any)}>
+						<HStack gap={6}>
+							{[
+								{ value: "all", label: "All" },
+								{ value: "published", label: "Published" },
+								{ value: "unpublished", label: "Unpublished" },
+							].map((item) => (
+								<RadioGroup.Item key={item.value} value={item.value}>
+									<RadioGroup.ItemHiddenInput />
+									<RadioGroup.ItemIndicator />
+									<RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
+								</RadioGroup.Item>
 							))}
+						</HStack>
+					</RadioGroup.Root>
+
+					{filteredPosts.length > 0 ? ( // Changed state variable name
+						<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
+							{filteredPosts.map(
+								(
+									post // Changed state variable name
+								) => (
+									<PostCard
+										key={post.id}
+										post={post}
+										onPostStatusChange={handlePostStatusChange} // Added prop
+									/>
+								)
+							)}
 						</SimpleGrid>
 					) : (
 						<EmptyState
@@ -112,12 +166,13 @@ const UserDashboardPage: React.FC = () => {
 					</Flex>
 					{allBlogs.length > 0 ? ( // Changed state variable name
 						<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-							{allBlogs.map((blog) => ( // Changed state variable name
-								<BlogCard
-									key={blog.id}
-									blog={blog}
-								/>
-							))}
+							{allBlogs.map(
+								(
+									blog // Changed state variable name
+								) => (
+									<BlogCard key={blog.id} blog={blog} />
+								)
+							)}
 						</SimpleGrid>
 					) : (
 						<EmptyState
