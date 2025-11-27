@@ -1,59 +1,64 @@
-import axios from "axios";
+import { get, post, put } from "./api-client";
 import type {
-	IAuthResponseDto,
-	ILoginUserDto,
-	IRegisterUserDto,
-	IUpdateUserProfileDto,
-	IUserDto,
-} from "../types/analystics";
+	AuthResponseDto,
+	LoginUserDto,
+	RegisterUserDto,
+	UpdateUserProfileDto,
+	UserDto,
+} from "../types/api";
 
 export const getUsers = async () => {
 	try {
-		const response = await axios.get<IUserDto[]>("/User/all");
-		return response.data;
+		const response = await get<UserDto[]>("/User/all");
+		return response;
 	} catch (error) {
-		console.log(error);
+		console.error("Error fetching users:", error);
+		throw error;
 	}
 };
 
 export const getUserById = async (id: number) => {
 	try {
-		const response = await axios.get<IUserDto>(`/User/${id}`);
-		return response.data;
+		const response = await get<UserDto>(`/User/${id}`);
+		return response;
 	} catch (error) {
-		console.log(error);
+		console.error(`Error fetching user with ID ${id}:`, error);
+		throw error;
 	}
 };
 
-export const registerUser = async (data: IRegisterUserDto) => {
+export const registerUser = async (data: RegisterUserDto) => {
 	try {
-		const response = await axios.post<IAuthResponseDto>("/User/register", data);
-		return response.data;
+		const response = await post<AuthResponseDto>("/User/register", data);
+		return response;
 	} catch (error) {
-		console.log(error);
+		console.error("Error registering user:", error);
+		throw error;
 	}
 };
 
-export const loginUser = async (data: ILoginUserDto) => {
+export const loginUser = async (data: LoginUserDto) => {
 	try {
-		const response = await axios.post<IAuthResponseDto>("/User/login", data);
-		return response.data;
+		const response = await post<AuthResponseDto>("/User/login", data);
+		return response;
 	} catch (error) {
-		console.log(error);
+		console.error("Error logging in user:", error);
+		throw error;
 	}
 };
 
 export const updateUserProfile = async (
 	id: number,
-	data: IUpdateUserProfileDto
+	data: UpdateUserProfileDto
 ) => {
 	try {
-		const response = await axios.put<IAuthResponseDto>(
+		const response = await put<AuthResponseDto>(
 			`/User/profile/${id}`,
 			data
 		);
-		return response.data;
+		return response;
 	} catch (error) {
-		console.log(error);
+		console.error(`Error updating user profile for ID ${id}:`, error);
+		throw error;
 	}
 };

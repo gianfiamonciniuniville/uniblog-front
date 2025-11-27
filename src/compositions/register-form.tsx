@@ -5,9 +5,11 @@ import type { FormEventHandler } from "react";
 import { InputField } from "./form-elements"; // Import custom InputField
 import Button from "./button"; // Import custom Button
 
-interface LoginFormProps {
+interface RegisterFormProps {
+    userName?: string;
 	email?: string;
 	password?: string;
+    setUserName: (userName: string) => void;
 	setEmail: (email: string) => void;
 	setPassword: (password: string) => void;
 	onSubmit: () => void;
@@ -15,8 +17,8 @@ interface LoginFormProps {
     errorMessage?: string | null;
 }
 
-export const LoginForm = (props: LoginFormProps) => {
-	const { email, password, setEmail, setPassword, onSubmit, disabled, errorMessage } = props;
+export const RegisterForm = (props: RegisterFormProps) => {
+	const { userName, email, password, setUserName, setEmail, setPassword, onSubmit, disabled, errorMessage } = props;
 
 	const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
 		e.preventDefault();
@@ -33,6 +35,13 @@ export const LoginForm = (props: LoginFormProps) => {
                             {errorMessage}
                         </Alert>
                     )}
+                    <InputField
+						label="Username"
+						type="text"
+						value={userName}
+						onChange={(e) => setUserName(e.target.value)}
+                        disabled={disabled}
+					/>
 					<InputField
 						label="Email"
 						type="email"
@@ -48,7 +57,7 @@ export const LoginForm = (props: LoginFormProps) => {
                         disabled={disabled}
 					/>
 					<Button type="submit" variant="primary" isLoading={disabled}>
-						Login
+						Register
 					</Button>
 				</Stack>
 			</form>

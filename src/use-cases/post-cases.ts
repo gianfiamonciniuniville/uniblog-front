@@ -1,65 +1,101 @@
-import axios from "axios";
-import type { IPostCreateDto, IPostDto, IPostUpdateDto } from "../types/post";
+// src/use-cases/post-cases.ts
+import { get, post, put, remove } from "./api-client";
+import type { Post, PostCreateDto, PostUpdateDto } from "../types/api"; // Added 'type' keyword for imports
 
-export const getPosts = async () => {
-	try {
-		const response = await axios.get<IPostDto[]>("/Post/all");
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+export const getAllPosts = async () => {
+  try {
+    const response = await get<Post[]>("/Post/all");
+    return response;
+  } catch (error) {
+    console.error("Error fetching all posts:", error);
+    throw error;
+  }
 };
 
-export const createPost = async (data: IPostCreateDto) => {
-	try {
-		const response = await axios.post<IPostDto>("/Post", data);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
-};
-
+// New function: getPostById
 export const getPostById = async (id: number) => {
-	try {
-		const response = await axios.get<IPostDto>(`/Post/${id}`);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+  try {
+    // Since there's no direct API for /Post/{id} GET, we fetch all and filter
+    const allPosts = await getAllPosts();
+    const post = allPosts.find(p => p.id === id);
+    if (!post) {
+        throw new Error(`Post with ID ${id} not found.`);
+    }
+    return post;
+  } catch (error) {
+    console.error(`Error fetching post by ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const updatePost = async (id: number, data: IPostUpdateDto) => {
-	try {
-		const response = await axios.put<IPostDto>(`/Post/${id}`, data);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+export const createPost = async (data: PostCreateDto) => {
+  try {
+    const response = await post<Post>("/Post", data);
+    return response;
+  } catch (error) {
+    console.error("Error creating post:", error);
+    throw error;
+  }
+};
+
+export const updatePost = async (id: number, data: PostUpdateDto) => {
+  try {
+    const response = await put<Post>(`/Post/${id}`, data);
+    return response;
+  } catch (error) {
+    console.error(`Error updating post with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// New function: deletePost
+export const deletePost = async (id: number) => {
+  try {
+    const response = await remove<void>(`/Post/${id}`);
+    return response;
+  } catch (error) {
+    console.error(`Error deleting post with ID ${id}:`, error);
+    throw error;
+  }
 };
 
 export const publishPost = async (id: number) => {
-	try {
-		const response = await axios.post<IPostDto>(`/Post/${id}/publish`);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+  try {
+    const response = await post<void>(`/Post/${id}/publish`, {}); // Empty body for post request
+    return response;
+  } catch (error) {
+    console.error(`Error publishing post with ID ${id}:`, error);
+    throw error;
+  }
 };
 
 export const getPostBySlug = async (slug: string) => {
-	try {
-		const response = await axios.get<IPostDto>(`/Post/slug/${slug}`);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+  try {
+    const response = await get<Post>(`/Post/slug/${slug}`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching post with slug ${slug}:`, error);
+    throw error;
+  }
 };
 
-export const getPostsByAuthorId = async (authorId: number) => {
-	try {
-		const response = await axios.get<IPostDto[]>(`/Post/author/${authorId}`);
-		return response.data;
-	} catch (error) {
-		console.log(error);
-	}
+export const getPostsByAuthor = async (authorId: number) => {
+  try {
+    const response = await get<Post[]>(`/Post/author/${authorId}`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching posts by author with ID ${authorId}:`, error);
+    throw error;
+  }
+};
+
+export const getPostsByBlogId = async (blogId: number) => {
+  try {
+    const allPosts = await getAllPosts(); // Fetch all posts
+    const filteredPosts = allPosts.filter(post => post.blogId === blogId);
+    return filteredPosts;
+  } catch (error) {
+    console.error(`Error fetching posts for blog with ID ${blogId}:`, error);
+    throw error;
+  }
 };
