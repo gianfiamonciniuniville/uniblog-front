@@ -1,5 +1,5 @@
 import { Progress as ChakraProgress } from "@chakra-ui/react"
-import { InfoTip } from "compositions/ui/toggle-tip"
+import { InfoTip } from "./toggle-tip"
 import * as React from "react"
 
 export const ProgressBar = React.forwardRef<

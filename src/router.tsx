@@ -8,7 +8,7 @@ import { TbError404 } from "react-icons/tb";
 import type { ReactNode } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { HomePage } from "./pages/HomePAge";
+import { HomePage } from "./pages/HomePage";
 import { useAuth } from "./store/auth";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {

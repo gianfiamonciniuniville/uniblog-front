@@ -4,7 +4,7 @@ import {
   Stat as ChakraStat,
   FormatNumber,
 } from "@chakra-ui/react"
-import { InfoTip } from "compositions/ui/toggle-tip"
+import { InfoTip } from "./toggle-tip"
 import * as React from "react"
 
 interface StatLabelProps extends ChakraStat.LabelProps {
