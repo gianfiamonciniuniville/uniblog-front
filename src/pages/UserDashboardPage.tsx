@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { Heading, VStack, Box, SimpleGrid, Flex } from "@chakra-ui/react";
 import { useAuth } from "../store/auth";
@@ -48,9 +49,10 @@ const UserDashboardPage: React.FC = () => {
 	const handleDeletePost = (postId: number) => {
 		// Implement delete functionality for posts, similar to AuthorPostListPage
 		// For now, this will be handled in a later refinement or through the PostCard directly
-		toaster.info(
-			"Delete Post functionality not yet fully implemented on dashboard."
-		);
+		toaster.info({
+			title:
+				"Delete Post functionality not yet fully implemented on dashboard.",
+		});
 	};
 
 	const handleEditPost = (postId: number) => {
@@ -64,9 +66,10 @@ const UserDashboardPage: React.FC = () => {
 	const handleDeleteBlog = (blogId: number) => {
 		// Implement delete functionality for blogs, similar to BlogListPage
 		// For now, this will be handled in a later refinement or through the BlogCard directly
-		toaster.info(
-			"Delete Blog functionality not yet fully implemented on dashboard."
-		);
+		toaster.info({
+			title:
+				"Delete Blog functionality not yet fully implemented on dashboard.",
+		});
 	};
 
 	const handleEditBlog = (blogId: number) => {

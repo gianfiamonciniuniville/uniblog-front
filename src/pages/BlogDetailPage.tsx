@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Blog, Post } from "../types/api";
 import { getBlogById } from "../use-cases/blog-cases";
-import { getPostsByBlogId } from "../use-cases/post-cases";
 import { Box, Heading, Text, SimpleGrid, VStack } from "@chakra-ui/react";
 import PostCard from "../compositions/PostCard";
 import { toaster } from "../compositions/toaster"; // Import the toaster
@@ -38,7 +37,7 @@ const BlogDetailPage: React.FC = () => {
 			}
 		};
 		fetchData();
-	}, [blogId, toaster]);
+	}, [blogId]);
 
 	console.log(posts);
 
