@@ -1,78 +1,73 @@
-// src/compositions/LikeButton.tsx
-import React, { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState } from "react";
 import { Icon, Text } from "@chakra-ui/react"; // Import Icon explicitly
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { createLike, deleteLike } from "../use-cases/like-cases";
 import { useAuth } from "../store/auth";
-import type { Post } from "../types/api";
+import type { LikeDto, Post } from "../types/api";
 import Button from "./button"; // Import custom Button
 import { toaster } from "./toaster"; // Import the toaster
 
 interface LikeButtonProps {
-  postId: number;
-  initialLikesCount: number;
-  userHasLikedInitial: boolean;
-  post?: Post;
+	postId: number;
+	initialLikesCount: number;
+	userHasLikedInitial: boolean;
+	post?: Post;
+	findLikeOfUser?: LikeDto;
+	fetchPost?: () => Promise<void>;
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialLikesCount, userHasLikedInitial, post }) => {
-  const [likesCount, setLikesCount] = useState(initialLikesCount);
-  const [userHasLiked, setUserHasLiked] = useState(userHasLikedInitial);
-  const [loading, setLoading] = useState(false);
-  const { user, isLoggedIn } = useAuth();
+const LikeButton: React.FC<LikeButtonProps> = ({
+	postId,
+	initialLikesCount,
+	userHasLikedInitial,
+	findLikeOfUser,
+	fetchPost,
+}) => {
+	const [loading, setLoading] = useState(false);
+	const { user, isLoggedIn } = useAuth();
 
-  useEffect(() => {
-    setLikesCount(initialLikesCount);
-    setUserHasLiked(userHasLikedInitial);
-  }, [initialLikesCount, userHasLikedInitial]);
+	const userHasLiked = userHasLikedInitial;
 
-  const handleLikeToggle = async () => {
-    if (!isLoggedIn || !user?.id) {
-      toaster.error("You must be logged in to like posts."); // Use toaster
-      return;
-    }
+	const handleLikeToggle = async () => {
+		if (!isLoggedIn || !user?.id) {
+			toaster.error({ title: "You must be logged in to like posts." });
+			return;
+		}
 
-    setLoading(true);
+		setLoading(true);
 
-    try {
-      if (userHasLiked) {
-        const likeToDelete = post?.likes?.find(like => like.userId === user.id);
-        if (likeToDelete) {
-            await deleteLike(likeToDelete.id);
-            setLikesCount((prev) => prev - 1);
-            setUserHasLiked(false);
-        } else {
-            toaster.error("Could not find your like to remove."); // Use toaster
-        }
+		try {
+			if (userHasLiked) {
+				await deleteLike(findLikeOfUser?.id || 0);
+			} else {
+				await createLike({ postId, userId: user.id });
+			}
+		} catch (err: any) {
+			toaster.error({ title: "Failed to toggle like." + (err.message || "") });
+		} finally {
+			setLoading(false);
+			if (fetchPost) {
+				await fetchPost();
+			}
+		}
+	};
 
-      } else {
-        await createLike({ postId, userId: user.id });
-        setLikesCount((prev) => prev + 1);
-        setUserHasLiked(true);
-      }
-    } catch (err: any) {
-      toaster.error(err.message || "Failed to toggle like."); // Use toaster
-      // Revert state if API call fails
-      setUserHasLiked(!userHasLiked);
-      setLikesCount(userHasLiked ? likesCount + 1 : likesCount - 1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Button
-      onClick={handleLikeToggle}
-      isLoading={loading}
-      disabled={!isLoggedIn}
-      variant="ghost" // Use custom ghost variant
-      leftIcon={<Icon as={userHasLiked ? FaHeart : FaRegHeart} color={userHasLiked ? "red.500" : "gray.500"} />}
-      colorScheme={userHasLiked ? "red" : "gray"} // Keep colorScheme for icon color
-    >
-      <Text mr={1}>{likesCount}</Text>
-      Likes
-    </Button>
-  );
+	return (
+		<Button
+			onClick={handleLikeToggle}
+			loading={loading}
+			disabled={!isLoggedIn}
+			variant="ghost"
+			colorScheme={userHasLiked ? "red" : "gray"}>
+			<Icon
+				as={userHasLiked ? FaHeart : FaRegHeart}
+				color={userHasLiked ? "red.500" : "gray.500"}
+			/>
+			<Text mr={1}>{initialLikesCount}</Text>
+			Likes
+		</Button>
+	);
 };
 
 export default LikeButton;
