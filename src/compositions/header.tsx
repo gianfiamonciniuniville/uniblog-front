@@ -1,154 +1,166 @@
-// src/compositions/header.tsx
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../store/auth";
-import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa"; // Import icons
+import {
+	Box,
+	Flex,
+	HStack,
+	IconButton,
+	Button,
+	useDisclosure,
+	Stack,
+	Link,
+	AvatarFallback,
+	AvatarImage,
+	Separator,
+} from "@chakra-ui/react";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { Avatar } from "./avatar";
 
 const Header: React.FC = () => {
-  const { isLoggedIn, logout, user } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const { isLoggedIn, logout, user } = useAuth();
+	const { open, onToggle } = useDisclosure();
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+	return (
+		<Box
+			boxShadow="sm"
+			px={6}
+			py={3}
+			position="sticky"
+			top={0}
+			zIndex={100}
+			w={"100%"}>
+			<Flex align="center" justify="space-between" maxW="6xl" mx="auto">
+				<Link
+					href="/"
+					fontSize="2xl"
+					fontWeight="extrabold"
+					color="blue.600"
+					_hover={{ color: "blue.700" }}>
+					UniBlog
+				</Link>
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+				<HStack display={{ base: "none", md: "flex" }}>
+					<Link
+						href="/blogs"
+						fontWeight="medium"
+						_hover={{ color: "blue.600" }}>
+						Blogs
+					</Link>
 
-  return (
-    <header className="bg-white shadow-md py-4 px-6 md:px-8">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-3xl font-extrabold text-blue-600 hover:text-blue-800 transition-colors duration-200">
-          UniBlog
-        </Link>
+					<Link
+						href="/posts"
+						fontWeight="medium"
+						_hover={{ color: "blue.600" }}>
+						Posts
+					</Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/blogs" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-            Blogs
-          </Link>
-          <Link to="/posts" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-            Posts
-          </Link>
+					<Separator orientation="vertical" height="4" ml={4} />
 
-          {isLoggedIn ? (
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 focus:outline-none"
-              >
-                <FaUserCircle className="text-2xl" />
-                <span>{user?.userName || "Profile"}</span>
-              </button>
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                  <Link
-                    to={`/profile/${user?.id}`}
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    My Profile
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsDropdownOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-x-4">
-              <Link
-                to="/login"
-                className="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors duration-200"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
-              >
-                Register
-              </Link>
-            </div>
-          )}
-        </nav>
+					{isLoggedIn ? (
+						<>
+							<Link
+								href={`/profile/${user?.id}`}
+								fontWeight="medium"
+								_hover={{ color: "blue.600" }}>
+								<Avatar>
+									<AvatarFallback name={user?.userName} />
+									<AvatarImage src={user?.profileImageUrl || ""} />
+								</Avatar>
+							</Link>
 
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button onClick={toggleMobileMenu} className="text-gray-700 hover:text-blue-600 focus:outline-none">
-            {isMobileMenuOpen ? <FaTimes className="text-2xl" /> : <FaBars className="text-2xl" />}
-          </button>
-        </div>
-      </div>
+							<Button
+								colorScheme="red"
+								size="sm"
+								onClick={() => {
+									logout();
+								}}>
+								Logout
+							</Button>
+						</>
+					) : (
+						<Link
+							href="/login"
+							fontWeight="medium"
+							_hover={{ color: "blue.600" }}>
+							Login
+						</Link>
+					)}
+				</HStack>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden mt-4">
-          <nav className="flex flex-col space-y-2">
-            <Link
-              to="/blogs"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-            >
-              Blogs
-            </Link>
-            <Link
-              to="/posts"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-            >
-              Posts
-            </Link>
-            {isLoggedIn ? (
-              <>
-                <Link
-                  to={`/profile/${user?.id}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                >
-                  My Profile
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-4 py-2 text-blue-600 border border-blue-600 rounded-md text-center hover:bg-blue-50"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-4 py-2 bg-blue-600 text-white rounded-md text-center hover:bg-blue-700"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      )}
-    </header>
-  );
+				<IconButton
+					display={{ base: "flex", md: "none" }}
+					onClick={onToggle}
+					aria-label="Toggle Menu"
+					size="lg">
+					{open ? <FaTimes /> : <FaBars />}
+				</IconButton>
+			</Flex>
+
+			{open && (
+				<Box mt={3} display={{ md: "none" }}>
+					<Stack>
+						<Link
+							href="/blogs"
+							onClick={onToggle}
+							py={2}
+							px={3}
+							borderRadius="md">
+							Blogs
+						</Link>
+
+						<Link
+							href="/posts"
+							onClick={onToggle}
+							py={2}
+							px={3}
+							borderRadius="md">
+							Posts
+						</Link>
+
+						{isLoggedIn ? (
+							<>
+								<Link
+									href={`/profile/${user?.id}`}
+									fontWeight="medium"
+									_hover={{ color: "blue.600" }}>
+									<Avatar>
+										<AvatarFallback name={user?.userName} />
+										<AvatarImage src={user?.profileImageUrl || ""} />
+									</Avatar>
+								</Link>
+
+								<Button
+									onClick={() => {
+										logout();
+										onToggle();
+									}}
+									variant="ghost"
+									justifyContent="flex-start">
+									Logout
+								</Button>
+							</>
+						) : (
+							<>
+								<Link href="/login">
+									<Button
+										variant="outline"
+										colorScheme="blue"
+										onClick={onToggle}>
+										Login
+									</Button>
+								</Link>
+
+								<Link href="/register">
+									<Button colorScheme="blue" onClick={onToggle}>
+										Register
+									</Button>
+								</Link>
+							</>
+						)}
+					</Stack>
+				</Box>
+			)}
+		</Box>
+	);
 };
 
 export default Header;

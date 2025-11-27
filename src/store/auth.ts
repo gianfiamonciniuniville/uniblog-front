@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import type { LoginUserDto, UserDto, RegisterUserDto } from "../types/api";
 import {
+	getUserById,
 	loginUser,
 	registerUser as registerUserService,
 } from "../use-cases/user-cases";
@@ -36,7 +37,20 @@ export const useAuth = () => {
 		const storedUser = localStorage.getItem("user");
 		if (storedToken && storedUser) {
 			setToken(storedToken);
-			setUser(JSON.parse(storedUser));
+			const getToken = async () => {
+				const storedToken = localStorage.getItem("token");
+				if (storedToken) {
+					try {
+						const response = await getUserById(JSON.parse(storedUser).id);
+						if (response) {
+							setUser(response);
+						}
+					} catch (error: any) {
+						console.error("Failed to get user info:", error);
+					}
+				}
+			};
+			getToken();
 		}
 	}, []);
 
