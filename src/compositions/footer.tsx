@@ -13,7 +13,7 @@ import { FaFacebook, FaInstagram, FaGithub } from "react-icons/fa";
 const Footer: React.FC = () => {
 	return (
 		<Box
-			bg="gray.900"
+			bg={{ _dark: "gray.900", _light: "gray.100" }}
 			color="gray.300"
 			py={6}
 			mt={20}
@@ -26,9 +26,14 @@ const Footer: React.FC = () => {
 					direction={{ base: "column", md: "row" }}
 					justify="space-between"
 					align="center">
-					<Text fontWeight="bold" color="white">
+					<Link
+						href="/"
+						fontSize="2xl"
+						fontWeight="extrabold"
+						color="blue.600"
+						_hover={{ color: "blue.700" }}>
 						UniBlog
-					</Text>
+					</Link>
 
 					<HStack>
 						<Link _hover={{ textDecoration: "underline", color: "white" }}>

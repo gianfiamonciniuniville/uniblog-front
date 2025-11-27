@@ -12,12 +12,15 @@ import {
 	AvatarImage,
 	Separator,
 } from "@chakra-ui/react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
 import { Avatar } from "./avatar";
+import { useColorMode, useColorModeValue } from "./color-mode";
 
 const Header: React.FC = () => {
 	const { isLoggedIn, logout, user } = useAuth();
 	const { open, onToggle } = useDisclosure();
+	const { toggleColorMode } = useColorMode();
+	const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 
 	return (
 		<Box
@@ -84,6 +87,9 @@ const Header: React.FC = () => {
 							Login
 						</Link>
 					)}
+					<IconButton variant="ghost" onClick={toggleColorMode}>
+						<SwitchIcon />
+					</IconButton>
 				</HStack>
 
 				<IconButton
@@ -156,6 +162,9 @@ const Header: React.FC = () => {
 								</Link>
 							</>
 						)}
+						<IconButton variant="ghost" onClick={toggleColorMode}>
+							<SwitchIcon />
+						</IconButton>
 					</Stack>
 				</Box>
 			)}
