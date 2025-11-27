@@ -6,7 +6,7 @@ import { Provider } from "./compositions/provider.tsx";
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
-		<Provider themes={["light"]}>
+		<Provider themes={["light", "dark"]}>
 			<App />
 		</Provider>
 	</StrictMode>
