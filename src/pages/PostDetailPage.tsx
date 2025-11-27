@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams, Link as RouterLink } from "react-router-dom";
 import type { Post, CommentCreateDto } from "../types/api";
-import { getPostBySlug } from "../use-cases/post-cases";
+import { getPostBySlug, deletePost } from "../use-cases/post-cases";
 import { createComment, deleteComment } from "../use-cases/comment-cases";
 import {
 	Box,
@@ -11,6 +11,8 @@ import {
 	Spinner,
 	Link as ChakraLink,
 	VStack,
+	Button,
+	HStack,
 } from "@chakra-ui/react";
 import { Alert, AlertIcon } from "@chakra-ui/alert";
 import CommentList from "../compositions/CommentList";
@@ -19,6 +21,7 @@ import LikeButton from "../compositions/LikeButton";
 import { useAuth } from "../store/auth";
 import { toaster } from "../compositions/toaster"; // Import the toaster
 import { EmptyState } from "../compositions/empty-state"; // Import EmptyState
+import { useNavigate } from "react-router-dom";
 
 const PostDetailPage: React.FC = () => {
 	const { slug } = useParams<{ slug: string }>();
@@ -27,9 +30,33 @@ const PostDetailPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [commentLoading, setCommentLoading] = useState(false);
 	const [commentError, setCommentError] = useState<string | null>(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 	const { user, isLoggedIn } = useAuth();
+	const navigate = useNavigate();
 
-	const fetchPost = async () => {
+	const handleDeletePost = async () => {
+		if (
+			!window.confirm(
+				"Are you sure you want to delete this post? This action cannot be undone."
+			)
+		) {
+			return;
+		}
+		setIsDeleting(true);
+		try {
+			if (post?.id) {
+				await deletePost(post.id);
+				toaster.success({ title: "Post deleted successfully!" });
+				navigate(`/profile/${user?.id}/posts`); // Redirect to author's post list
+			}
+		} catch (err: any) {
+			toaster.error({ title: err.message || "Failed to delete post." });
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
+	const fetchPost = useCallback(async () => {
 		if (!slug) {
 			setError("Post slug is missing.");
 			setDisabled(false);
@@ -43,11 +70,11 @@ const PostDetailPage: React.FC = () => {
 		} finally {
 			setDisabled(false);
 		}
-	};
+	}, [slug]); // Add slug as a dependency for useCallback
 
 	useEffect(() => {
 		fetchPost();
-	}, [slug]);
+	}, [fetchPost]); // Now fetchPost is a stable dependency
 
 	const handleCommentSubmit = async (content: string) => {
 		if (!user?.id || !post?.id) {
@@ -124,13 +151,31 @@ const PostDetailPage: React.FC = () => {
 	const userHasLiked =
 		post.likes?.some((like) => like.user.id === user?.id) || false;
 	const findLikeOfUser = post.likes?.find((like) => like.user.id === user?.id);
+	const isAuthor = user && post.author.id === user.id;
 
 	return (
 		<Box p={4} w="100%" mx="auto">
 			<VStack align="start" gap={4} w="100%" alignItems={"center"}>
-				<Heading as="h1" size="xl">
-					{post.title}
-				</Heading>
+				<HStack justifyContent="space-between" w="100%">
+					<Heading as="h1" size="xl">
+						{post.title}
+					</Heading>
+					{isAuthor && (
+						<HStack>
+							<Button
+								colorScheme="blue"
+								onClick={() => navigate(`/posts/${post.slug}/edit`)}>
+								Edit
+							</Button>
+							<Button
+								colorScheme="red"
+								onClick={handleDeletePost}
+								loading={isDeleting}>
+								Delete
+							</Button>
+						</HStack>
+					)}
+				</HStack>
 				<Text fontSize="md" color="gray.500">
 					By{" "}
 					<ChakraLink href={`/profile/${post.author.id}`} color="blue.500">

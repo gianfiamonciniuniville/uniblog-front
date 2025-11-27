@@ -2,7 +2,7 @@
 // src/pages/BlogListPage.tsx
 import React, { useEffect, useState } from "react";
 import type { Blog } from "../types/api";
-import { getAllBlogs, deleteBlog } from "../use-cases/blog-cases";
+import { getBlogsByAuthor, deleteBlog } from "../use-cases/blog-cases"; // Changed import
 import { Box, Heading, SimpleGrid } from "@chakra-ui/react";
 import BlogCard from "../compositions/BlogCard";
 import { useNavigate } from "react-router-dom";
@@ -19,8 +19,13 @@ const BlogListPage: React.FC = () => {
 
 	useEffect(() => {
 		const fetchBlogs = async () => {
+			if (!user?.id) {
+				toaster.error({ title: "User not authenticated or user ID not available." });
+				setDisabled(false);
+				return;
+			}
 			try {
-				const data = await getAllBlogs();
+				const data = await getBlogsByAuthor(user.id); // Changed function call
 				setBlogs(data);
 			} catch (err: any) {
 				toaster.error({ title: err.message || "Failed to fetch blogs." });
@@ -29,7 +34,7 @@ const BlogListPage: React.FC = () => {
 			}
 		};
 		fetchBlogs();
-	}, []);
+	}, [user]); // Added user to dependency array
 
 	const handleEdit = (id: number) => {
 		navigate(`/blogs/edit/${id}`);
@@ -59,7 +64,16 @@ const BlogListPage: React.FC = () => {
 		return (
 			<EmptyState
 				title="Loading Blogs..."
-				description="Please wait while we fetch the blogs."
+				description="Please wait while we fetch your blogs." // Updated description
+			/>
+		);
+	}
+
+	if (!isLoggedIn) {
+		return (
+			<EmptyState
+				title="Access Denied"
+				description="You must be logged in to view your blogs."
 			/>
 		);
 	}
@@ -68,7 +82,7 @@ const BlogListPage: React.FC = () => {
 		return (
 			<EmptyState
 				title="No Blogs Found"
-				description="There are no blogs available yet.">
+				description="You haven't created any blogs yet."> // Updated description
 				{isLoggedIn && (
 					<Button
 						variant="solid"
@@ -84,7 +98,7 @@ const BlogListPage: React.FC = () => {
 	return (
 		<Box p={4}>
 			<Heading as="h1" size="xl" mb={6}>
-				All Blogs
+				Your Blogs
 			</Heading>
 			{isLoggedIn && (
 				<Button

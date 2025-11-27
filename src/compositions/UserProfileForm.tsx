@@ -1,6 +1,6 @@
 // src/compositions/UserProfileForm.tsx
 import React, { useState, useEffect } from "react";
-import { Box, Input, Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { Alert, AlertIcon } from "@chakra-ui/alert";
 import type { UserDto, UpdateUserProfileDto } from "../types/api";
 import { InputField, TextareaField } from "./form-elements"; // Import custom InputField and TextareaField
@@ -47,8 +47,8 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
             </Alert>
           )}
           {/* Read-only fields using Chakra's Input */}
-          <InputField label="Username" type="text" value={initialData?.userName || ""} isReadOnly disabled={disabled} />
-          <InputField label="Email" type="email" value={initialData?.email || ""} isReadOnly disabled={disabled} />
+          <InputField label="Username" type="text" value={initialData?.userName || ""} readOnly disabled={disabled} />
+          <InputField label="Email" type="email" value={initialData?.email || ""} readOnly disabled={disabled} />
 
           <TextareaField
             label="Bio"
@@ -65,7 +65,7 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
             disabled={disabled}
             placeholder="https://example.com/your-image.jpg"
           />
-          <Button type="submit" variant="primary" isLoading={disabled}>
+          <Button type="submit" colorScheme="blue" variant="solid" loading={disabled}>
             {submitButtonText}
           </Button>
         </Stack>

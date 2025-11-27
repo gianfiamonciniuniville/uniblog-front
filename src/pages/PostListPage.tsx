@@ -1,24 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import type { Post } from "../types/api"; // type-only import
-import { getAllPosts } from "../use-cases/post-cases";
+import { getPostsByAuthor } from "../use-cases/post-cases"; // Changed import
 import { Box, Heading, SimpleGrid, Spinner, Button } from "@chakra-ui/react"; // Box, Heading, SimpleGrid, Spinner, Button from react
 import { Alert, AlertIcon } from "@chakra-ui/alert"; // Alert and AlertIcon from alert
 import PostCard from "../compositions/PostCard";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import { EmptyState } from "../compositions/empty-state"; // Added EmptyState import
 
 const PostListPage: React.FC = () => {
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [disabled, setDisabled] = useState(true); // Changed from isLoading
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
-	const { isLoggedIn } = useAuth(); // Removed currentUser as it was unused
+	const { user, isLoggedIn } = useAuth(); // Destructured user
 
 	useEffect(() => {
 		const fetchPosts = async () => {
+			if (!user?.id) {
+				setError("User not authenticated or user ID not available.");
+				setDisabled(false);
+				return;
+			}
 			try {
-				const data = await getAllPosts();
+				const data = await getPostsByAuthor(user.id); // Changed function call
 				setPosts(data);
 			} catch (err: any) {
 				setError(err.message || "Failed to fetch posts.");
@@ -27,7 +33,7 @@ const PostListPage: React.FC = () => {
 			}
 		};
 		fetchPosts();
-	}, []);
+	}, [user]); // Added user to dependency array
 
 	if (disabled) {
 		return (
@@ -50,10 +56,19 @@ const PostListPage: React.FC = () => {
 		);
 	}
 
+	if (!isLoggedIn) {
+		return (
+			<EmptyState
+				title="Access Denied"
+				description="You must be logged in to view your posts."
+			/>
+		);
+	}
+
 	return (
 		<Box p={4}>
 			<Heading as="h1" size="xl" mb={6}>
-				All Posts
+				Your Posts
 			</Heading>
 			{isLoggedIn && (
 				<Button
@@ -63,17 +78,24 @@ const PostListPage: React.FC = () => {
 					Create New Post
 				</Button>
 			)}
-			<SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} gap={6}>
-				{posts.map((post) => (
-					<PostCard
-						key={post.id}
-						post={post}
-						showAuthor={true} // Optionally show author on list page
-						// onEdit={isLoggedIn && currentUser?.id === post.authorId ? handleEdit : undefined}
-						// onDelete={isLoggedIn && currentUser?.id === post.authorId ? handleDelete : undefined}
-					/>
-				))}
-			</SimpleGrid>
+			{posts.length > 0 ? (
+				<SimpleGrid columns={{ sm: 1, md: 2, lg: 3 }} gap={6}>
+					{posts.map((post) => (
+						<PostCard
+							key={post.id}
+							post={post}
+							showAuthor={true} // Optionally show author on list page
+							// onEdit={isLoggedIn && currentUser?.id === post.authorId ? handleEdit : undefined}
+							// onDelete={isLoggedIn && currentUser?.id === post.authorId ? handleDelete : undefined}
+						/>
+					))}
+				</SimpleGrid>
+			) : (
+				<EmptyState
+					title="No Posts"
+					description="You haven't created any posts yet."
+				/>
+			)}
 		</Box>
 	);
 };

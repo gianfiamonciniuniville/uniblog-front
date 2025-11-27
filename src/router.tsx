@@ -90,7 +90,7 @@ const router = createBrowserRouter([
 				element: <PostCreatePage />,
 			},
 			{
-				path: "posts/edit/:id",
+				path: "posts/:slug/edit",
 				element: <PostEditPage />,
 			},
 			{

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Heading, VStack, Box, SimpleGrid, Flex } from "@chakra-ui/react";
 import { useAuth } from "../store/auth";
-import { getPostsByAuthor } from "../use-cases/post-cases";
+import { getAllPosts } from "../use-cases/post-cases"; // Changed import
 import { getAllBlogs } from "../use-cases/blog-cases";
 import type { Post, Blog } from "../types/api";
 import { EmptyState } from "../compositions/empty-state";
@@ -15,8 +15,8 @@ import { useNavigate } from "react-router-dom";
 const UserDashboardPage: React.FC = () => {
 	const { user, isLoggedIn } = useAuth();
 	const navigate = useNavigate();
-	const [userPosts, setUserPosts] = useState<Post[]>([]);
-	const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
+	const [allPosts, setAllPosts] = useState<Post[]>([]); // Changed state variable name
+	const [allBlogs, setAllBlogs] = useState<Blog[]>([]); // Changed state variable name
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -30,12 +30,12 @@ const UserDashboardPage: React.FC = () => {
 
 			try {
 				setLoading(true);
-				const [postsData, allBlogsData] = await Promise.all([
-					getPostsByAuthor(user.id),
+				const [postsData, blogsData] = await Promise.all([ // Changed variable name
+					getAllPosts(), // Changed function call
 					getAllBlogs(),
 				]);
-				setUserPosts(postsData);
-				setUserBlogs(allBlogsData.filter((blog) => blog.user.id === user.id));
+				setAllPosts(postsData); // Changed state setter
+				setAllBlogs(blogsData); // Changed state setter
 			} catch (err: any) {
 				toaster.error(err.message || "Failed to load dashboard data.");
 				setError("Failed to load dashboard data.");
@@ -46,40 +46,11 @@ const UserDashboardPage: React.FC = () => {
 		fetchData();
 	}, [user]);
 
-	const handleDeletePost = (postId: number) => {
-		// Implement delete functionality for posts, similar to AuthorPostListPage
-		// For now, this will be handled in a later refinement or through the PostCard directly
-		toaster.info({
-			title:
-				"Delete Post functionality not yet fully implemented on dashboard.",
-		});
-	};
-
-	const handleEditPost = (postId: number) => {
-		const postToEdit = userPosts.find((p) => p.id === postId);
-		if (postToEdit) {
-			navigate(`/posts/edit/${postToEdit.id}`);
-		}
-	};
-
-	const handleDeleteBlog = (blogId: number) => {
-		// Implement delete functionality for blogs, similar to BlogListPage
-		// For now, this will be handled in a later refinement or through the BlogCard directly
-		toaster.info({
-			title:
-				"Delete Blog functionality not yet fully implemented on dashboard.",
-		});
-	};
-
-	const handleEditBlog = (blogId: number) => {
-		navigate(`/blogs/edit/${blogId}`);
-	};
-
 	if (loading) {
 		return (
 			<EmptyState
 				title="Loading Dashboard..."
-				description="Fetching your posts and blogs."
+				description="Fetching all posts and blogs." // Updated description
 			/>
 		);
 	}
@@ -101,33 +72,31 @@ const UserDashboardPage: React.FC = () => {
 		<Box p={4}>
 			<VStack spaceX={8} spaceY={8} align="stretch">
 				<Heading as="h1" size="xl">
-					Your Dashboard
+					Dashboard
 				</Heading>
 
 				<Box>
 					<Flex justifyContent="space-between" alignItems="center" mb={4}>
 						<Heading as="h2" size="lg">
-							Your Posts
+							All Posts
 						</Heading>
 						<Button variant="solid" onClick={() => navigate("/posts/create")}>
 							Create New Post
 						</Button>
 					</Flex>
-					{userPosts.length > 0 ? (
+					{allPosts.length > 0 ? ( // Changed state variable name
 						<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-							{userPosts.map((post) => (
+							{allPosts.map((post) => ( // Changed state variable name
 								<PostCard
 									key={post.id}
 									post={post}
-									onEdit={handleEditPost}
-									onDelete={handleDeletePost}
 								/>
 							))}
 						</SimpleGrid>
 					) : (
 						<EmptyState
 							title="No Posts"
-							description="You haven't created any posts yet."
+							description="No posts are available." // Updated description
 						/>
 					)}
 				</Box>
@@ -135,27 +104,25 @@ const UserDashboardPage: React.FC = () => {
 				<Box>
 					<Flex justifyContent="space-between" alignItems="center" mb={4}>
 						<Heading as="h2" size="lg">
-							Your Blogs
+							All Blogs
 						</Heading>
 						<Button variant="solid" onClick={() => navigate("/blogs/create")}>
 							Create New Blog
 						</Button>
 					</Flex>
-					{userBlogs.length > 0 ? (
+					{allBlogs.length > 0 ? ( // Changed state variable name
 						<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-							{userBlogs.map((blog) => (
+							{allBlogs.map((blog) => ( // Changed state variable name
 								<BlogCard
 									key={blog.id}
 									blog={blog}
-									onEdit={handleEditBlog}
-									onDelete={handleDeleteBlog}
 								/>
 							))}
 						</SimpleGrid>
 					) : (
 						<EmptyState
 							title="No Blogs"
-							description="You haven't created any blogs yet."
+							description="No blogs are available." // Updated description
 						/>
 					)}
 				</Box>

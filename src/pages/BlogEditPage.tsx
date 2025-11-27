@@ -21,22 +21,22 @@ const BlogEditPage: React.FC = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNaN(blogId)) {
-        toaster.error("Invalid Blog ID.");
+        toaster.error({ title: "Invalid Blog ID." });
         setDisabled(false);
         return;
       }
       try {
         const data = await getBlogById(blogId);
 
-        if (user && data.authorId === user.id) {
+        if (user && data.user.id === user.id) {
           setInitialData(data);
         } else {
-          toaster.error("You are not authorized to edit this blog.");
+          toaster.error({ title: "You are not authorized to edit this blog." });
           navigate("/"); // Redirect to home page
         }
 
       } catch (err: unknown) {
-        toaster.error((err as Error).message || "Failed to load blog for editing.");
+        toaster.error({ title: (err as Error).message || "Failed to load blog for editing." });
       } finally {
         setDisabled(false);
       }
@@ -48,15 +48,15 @@ const BlogEditPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       if (!initialData?.id) {
-        toaster.error("Blog ID not found for update.");
+        toaster.error({ title: "Blog ID not found for update." });
         setIsSubmitting(false);
         return;
       }
       await updateBlog(initialData.id, data);
-      toaster.success("Blog updated successfully!");
+      toaster.success({ title: "Blog updated successfully!" });
       navigate(`/blogs/${initialData.id}`); // Redirect to blog detail on success (assuming a blog detail page exists)
     } catch (err: unknown) {
-      toaster.error((err as Error).message || "Failed to update blog.");
+      toaster.error({ title: (err as Error).message || "Failed to update blog." });
     } finally {
       setIsSubmitting(false);
     }

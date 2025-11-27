@@ -70,7 +70,6 @@ const PostEditPage: React.FC = () => {
 				justifyContent="center"
 				alignItems="center"
 				minH="70vh">
-				{/* Using a generic loading spinner or skeleton instead of direct Chakra Spinner here */}
 				<EmptyState
 					title="Loading Post..."
 					description="Please wait while we fetch the post details."

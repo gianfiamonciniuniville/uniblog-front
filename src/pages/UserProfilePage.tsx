@@ -51,7 +51,7 @@ const UserProfilePage: React.FC = () => {
         return;
       }
       await updateUserProfile(currentUser.id, data);
-      toaster.success("Profile updated successfully!"); // Use toaster for success
+      toaster.success({ title: "Profile updated successfully!" }); // Use toaster for success
       // Optionally re-fetch user data to update the global auth state if needed
       // Or simply update the local state to reflect changes without a full re-fetch
     } catch (err: any) {

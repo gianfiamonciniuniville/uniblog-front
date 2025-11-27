@@ -2,11 +2,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Blog, Post } from "../types/api";
-import { getBlogById } from "../use-cases/blog-cases";
-import { Box, Heading, Text, SimpleGrid, VStack } from "@chakra-ui/react";
+import { getBlogById, deleteBlog } from "../use-cases/blog-cases";
+import {
+	Box,
+	Heading,
+	Text,
+	SimpleGrid,
+	VStack,
+	Button,
+	HStack,
+} from "@chakra-ui/react";
 import PostCard from "../compositions/PostCard";
 import { toaster } from "../compositions/toaster"; // Import the toaster
 import { EmptyState } from "../compositions/empty-state"; // Import EmptyState
+import { useAuth } from "../store/auth";
+import { useNavigate } from "react-router-dom";
 
 const BlogDetailPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -14,6 +24,31 @@ const BlogDetailPage: React.FC = () => {
 	const [blog, setBlog] = useState<Blog | null>(null);
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [disabled, setDisabled] = useState(true);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const { user } = useAuth();
+	const navigate = useNavigate();
+
+	const handleDeleteBlog = async () => {
+		if (
+			!window.confirm(
+				"Are you sure you want to delete this blog? This action cannot be undone."
+			)
+		) {
+			return;
+		}
+		setIsDeleting(true);
+		try {
+			if (blog?.id) {
+				await deleteBlog(blog.id);
+				toaster.success({ title: "Blog deleted successfully!" });
+				navigate(`/profile/${user?.id}/blogs`); // Redirect to author's blog list
+			}
+		} catch (err: any) {
+			toaster.error({ title: err.message || "Failed to delete blog." });
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -57,12 +92,31 @@ const BlogDetailPage: React.FC = () => {
 		);
 	}
 
+	const isAuthor = user && blog.user.id === user.id;
+
 	return (
 		<Box p={4}>
 			<VStack align="start" gap={4}>
-				<Heading as="h1" size="xl" mb={4}>
-					{blog.title}
-				</Heading>
+				<HStack justifyContent="space-between" w="100%">
+					<Heading as="h1" size="xl">
+						{blog.title}
+					</Heading>
+					{isAuthor && (
+						<HStack>
+							<Button
+								colorScheme="blue"
+								onClick={() => navigate(`/blogs/${blog.id}/edit`)}>
+								Edit
+							</Button>
+							<Button
+								colorScheme="red"
+								onClick={handleDeleteBlog}
+								loading={isDeleting}>
+								Delete
+							</Button>
+						</HStack>
+					)}
+				</HStack>
 				<Text fontSize="lg" mb={6}>
 					{blog.description}
 				</Text>

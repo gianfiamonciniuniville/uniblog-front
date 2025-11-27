@@ -56,7 +56,7 @@ export const RegisterForm = (props: RegisterFormProps) => {
 						onChange={(e) => setPassword(e.target.value)}
                         disabled={disabled}
 					/>
-					<Button type="submit" variant="primary" isLoading={disabled}>
+					<Button type="submit" colorScheme="blue" variant="solid" loading={disabled}>
 						Register
 					</Button>
 				</Stack>
