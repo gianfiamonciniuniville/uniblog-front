@@ -64,7 +64,7 @@ const PostDetailPage: React.FC = () => {
 			};
 			await createComment(newCommentData);
 			toaster.success({ title: "Comment added successfully!" });
-			await fetchPost(); // Re-fetch post to get updated comments
+			await fetchPost();
 		} catch (err: any) {
 			toaster.error(err.message || "Failed to add comment.");
 			setCommentError(err.message || "Failed to add comment.");
@@ -85,7 +85,7 @@ const PostDetailPage: React.FC = () => {
 		try {
 			await deleteComment(commentId);
 			toaster.success({ title: "Comment deleted successfully!" });
-			await fetchPost(); // Re-fetch post to get updated comments
+			await fetchPost();
 		} catch (err: any) {
 			toaster.error(err.message || "Failed to delete comment.");
 		}
@@ -126,8 +126,8 @@ const PostDetailPage: React.FC = () => {
 	const findLikeOfUser = post.likes?.find((like) => like.user.id === user?.id);
 
 	return (
-		<Box p={4}>
-			<VStack align="start" gap={4}>
+		<Box p={4} w="100%" mx="auto">
+			<VStack align="start" gap={4} w="100%" alignItems={"center"}>
 				<Heading as="h1" size="xl">
 					{post.title}
 				</Heading>

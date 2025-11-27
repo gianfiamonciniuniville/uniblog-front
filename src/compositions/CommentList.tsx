@@ -31,7 +31,7 @@ const CommentList: React.FC<CommentListProps> = ({
 	}
 
 	return (
-		<Box mt={8}>
+		<Box mt={8} w={"100%"}>
 			<Heading size="md" mb={4}>
 				Comments
 			</Heading>
@@ -42,7 +42,8 @@ const CommentList: React.FC<CommentListProps> = ({
 						p={4}
 						shadow="sm"
 						borderWidth="1px"
-						borderRadius="md">
+						borderRadius="md"
+						w={"100%"}>
 						<Flex justifyContent="space-between" alignItems="center">
 							<Text fontSize="sm" color="gray.500">
 								<ChakraLink
