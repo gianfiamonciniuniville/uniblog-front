@@ -110,7 +110,8 @@ const PostListPage: React.FC = () => {
 
 			<RadioGroup.Root
 				value={filterStatus}
-				onValueChange={(e) => setFilterStatus(e.value as any)}>
+				onValueChange={(e) => setFilterStatus(e.value as any)}
+				marginBottom={4}>
 				<HStack gap={6}>
 					{[
 						{ value: "all", label: "All" },

@@ -34,7 +34,7 @@ const PostCard: React.FC<PostCardProps> = ({
 				await publishPost(post.id);
 				toaster.success({ title: "Post published successfully!" });
 			} else {
-				await publishPost(post.id); // Is a publish toggle, so we call the same function
+				await publishPost(post.id);
 				toaster.success({ title: "Post unpublished successfully!" });
 			}
 			onPostStatusChange?.(post.id, isChecked);

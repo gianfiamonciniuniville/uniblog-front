@@ -37,11 +37,19 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 const router = createBrowserRouter([
 	{
 		path: "/login",
-		element: <LoginPage />,
+		element: (
+			<Layout>
+				<LoginPage />
+			</Layout>
+		),
 	},
 	{
 		path: "/register",
-		element: <RegisterPage />,
+		element: (
+			<Layout>
+				<RegisterPage />
+			</Layout>
+		),
 	},
 	{
 		path: "/",

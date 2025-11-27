@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Box, Heading, SimpleGrid, VStack } from "@chakra-ui/react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+	Box,
+	Heading,
+	HStack,
+	RadioGroup,
+	SimpleGrid,
+	VStack,
+} from "@chakra-ui/react";
 import { Alert, AlertIcon } from "@chakra-ui/alert";
 import PostCard from "../compositions/PostCard";
 import { getAllPosts } from "../use-cases/post-cases";
@@ -11,6 +18,19 @@ export const HomePage: React.FC = () => {
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [filterStatus, setFilterStatus] = useState<
+		"all" | "published" | "unpublished"
+	>("all");
+
+	const filteredPosts = useMemo(() => {
+		if (filterStatus === "all") {
+			return posts;
+		} else if (filterStatus === "published") {
+			return posts.filter((post) => post.published);
+		} else {
+			return posts.filter((post) => post.published == false);
+		}
+	}, [posts, filterStatus]);
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -72,10 +92,31 @@ export const HomePage: React.FC = () => {
 			<Heading as="h1" size="xl" mb={6}>
 				Latest Posts
 			</Heading>
+
+			<RadioGroup.Root
+				value={filterStatus}
+				onValueChange={(e) => setFilterStatus(e.value as any)}
+				marginBottom={4}>
+				<HStack gap={6}>
+					{[
+						{ value: "all", label: "All" },
+						{ value: "published", label: "Published" },
+						{ value: "unpublished", label: "Unpublished" },
+					].map((item) => (
+						<RadioGroup.Item key={item.value} value={item.value}>
+							<RadioGroup.ItemHiddenInput />
+							<RadioGroup.ItemIndicator />
+							<RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
+						</RadioGroup.Item>
+					))}
+				</HStack>
+			</RadioGroup.Root>
+
 			<SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spaceY={4} spaceX={4}>
-				{posts.map((post) => (
-					<PostCard key={post.id} post={post} showAuthor={true} />
-				))}
+				{filteredPosts.length > 0 &&
+					filteredPosts.map((post) => (
+						<PostCard key={post.id} post={post} showAuthor={true} />
+					))}
 			</SimpleGrid>
 		</Box>
 	);

@@ -50,12 +50,11 @@ const UserDashboardPage: React.FC = () => {
 			try {
 				setLoading(true);
 				const [postsData, blogsData] = await Promise.all([
-					// Changed variable name
-					getAllPosts(), // Removed isPublishedFilter
+					getAllPosts(),
 					getAllBlogs(),
 				]);
-				setAllPosts(postsData); // Changed state setter
-				setAllBlogs(blogsData); // Changed state setter
+				setAllPosts(postsData);
+				setAllBlogs(blogsData);
 			} catch (err: any) {
 				toaster.error(err.message || "Failed to load dashboard data.");
 				setError("Failed to load dashboard data.");
@@ -117,7 +116,8 @@ const UserDashboardPage: React.FC = () => {
 
 					<RadioGroup.Root
 						value={filterStatus}
-						onValueChange={(e) => setFilterStatus(e.value as any)}>
+						onValueChange={(e) => setFilterStatus(e.value as any)}
+						marginBottom={4}>
 						<HStack gap={6}>
 							{[
 								{ value: "all", label: "All" },
