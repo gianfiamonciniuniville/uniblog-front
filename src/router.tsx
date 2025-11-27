@@ -22,6 +22,7 @@ import PostCreatePage from "./pages/PostCreatePage";
 import PostEditPage from "./pages/PostEditPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import AuthorPostListPage from "./pages/AuthorPostListPage";
+import AuthorBlogListPage from "./pages/AuthorBlogListPage"; // Import AuthorBlogListPage
 import UserProfilePage from "./pages/UserProfilePage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
 			{
 				path: "blogs/:id",
 				element: <BlogDetailPage />,
+			},
+			{
+				path: "blogs/author/:authorId", // New route for author's blogs
+				element: <AuthorBlogListPage />,
 			},
 			{
 				path: "posts",

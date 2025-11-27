@@ -39,8 +39,6 @@ const BlogDetailPage: React.FC = () => {
 		fetchData();
 	}, [blogId]);
 
-	console.log(posts);
-
 	if (disabled) {
 		return (
 			<EmptyState

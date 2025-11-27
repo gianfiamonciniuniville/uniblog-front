@@ -74,7 +74,7 @@ export interface Blog {
 	id: number;
 	title: string;
 	description: string;
-	userId: number;
+	user: UserShortDto;
 	posts: Post[];
 }
 

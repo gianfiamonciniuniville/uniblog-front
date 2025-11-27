@@ -35,7 +35,7 @@ const UserDashboardPage: React.FC = () => {
 					getAllBlogs(),
 				]);
 				setUserPosts(postsData);
-				setUserBlogs(allBlogsData.filter((blog) => blog.userId === user.id));
+				setUserBlogs(allBlogsData.filter((blog) => blog.user.id === user.id));
 			} catch (err: any) {
 				toaster.error(err.message || "Failed to load dashboard data.");
 				setError("Failed to load dashboard data.");
@@ -56,7 +56,6 @@ const UserDashboardPage: React.FC = () => {
 	};
 
 	const handleEditPost = (postId: number) => {
-		// Implement edit functionality for posts
 		const postToEdit = userPosts.find((p) => p.id === postId);
 		if (postToEdit) {
 			navigate(`/posts/edit/${postToEdit.id}`);
@@ -73,7 +72,6 @@ const UserDashboardPage: React.FC = () => {
 	};
 
 	const handleEditBlog = (blogId: number) => {
-		// Implement edit functionality for blogs
 		navigate(`/blogs/edit/${blogId}`);
 	};
 

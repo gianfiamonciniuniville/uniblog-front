@@ -18,8 +18,8 @@ const Footer: React.FC = () => {
 			py={6}
 			mt={20}
 			as="footer"
+			position={"relative"}
 			bottom={0}
-			position={"absolute"}
 			w={"100%"}>
 			<Container maxW="6xl">
 				<Stack

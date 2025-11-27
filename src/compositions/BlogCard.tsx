@@ -2,39 +2,49 @@
 import React from "react";
 import type { Blog } from "../types/api";
 import { Link } from "react-router-dom";
-import { Box, Heading, Text, Stack } from "@chakra-ui/react"; // Remove Button from here
-import Button from "./button"; // Import custom Button
+import { Box, Heading, Text, Button, Stack } from "@chakra-ui/react";
 
 interface BlogCardProps {
 	blog: Blog;
 	onEdit?: (id: number) => void;
 	onDelete?: (id: number) => void;
+	showAuthor?: boolean;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete }) => {
+const BlogCard: React.FC<BlogCardProps> = ({
+	blog,
+	onEdit,
+	onDelete,
+	showAuthor = false,
+}) => {
 	return (
 		<Box p={5} shadow="md" borderWidth="1px" borderRadius="lg">
 			<Link to={`/blogs/${blog.id}`}>
+				{" "}
 				<Heading fontSize="xl">{blog.title}</Heading>
 			</Link>
 			<Text mt={4}>{blog.description}</Text>
-			<Stack direction="row" gap={4} mt={4}>
+			{showAuthor && (
+				<Text mt={2} fontSize="sm">
+					Author: {blog.user.userName}
+				</Text>
+			)}
+			<Stack direction="row" mt={4}>
 				<Link to={`/blogs/${blog.id}`}>
-					<Button variant="solid" size="sm">
-						View Details
+					<Button colorScheme="blue" size="sm">
+						View Blog
 					</Button>
 				</Link>
 				{onEdit && (
-					<Button variant="outline" size="sm" onClick={() => onEdit(blog.id)}>
+					<Button
+						colorScheme="yellow"
+						size="sm"
+						onClick={() => onEdit(blog.id)}>
 						Edit
 					</Button>
 				)}
 				{onDelete && (
-					<Button
-						variant="solid"
-						size="sm"
-						onClick={() => onDelete(blog.id)}
-						colorScheme="red">
+					<Button colorScheme="red" size="sm" onClick={() => onDelete(blog.id)}>
 						Delete
 					</Button>
 				)}

@@ -6,8 +6,8 @@ import { getBlogById, updateBlog } from "../use-cases/blog-cases";
 import { useNavigate, useParams } from "react-router-dom";
 import type { BlogUpdateDto, Blog } from "../types/api";
 import { useAuth } from "../store/auth";
-import { toaster } from "../compositions/toaster"; // Import the toaster
-import { EmptyState } from "../compositions/empty-state"; // Import EmptyState
+import { toaster } from "../compositions/toaster";
+import { EmptyState } from "../compositions/empty-state";
 
 const BlogEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,20 +21,22 @@ const BlogEditPage: React.FC = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNaN(blogId)) {
-        toaster.error("Invalid Blog ID."); // Use toaster
+        toaster.error("Invalid Blog ID.");
         setDisabled(false);
         return;
       }
       try {
         const data = await getBlogById(blogId);
-        if (user && data.userId === user.id) {
+
+        if (user && data.authorId === user.id) {
           setInitialData(data);
         } else {
-          toaster.error("You are not authorized to edit this blog."); // Use toaster
-          navigate("/blogs"); // Redirect to blogs list
+          toaster.error("You are not authorized to edit this blog.");
+          navigate("/"); // Redirect to home page
         }
-      } catch (err: any) {
-        toaster.error(err.message || "Failed to load blog for editing."); // Use toaster
+
+      } catch (err: unknown) {
+        toaster.error((err as Error).message || "Failed to load blog for editing.");
       } finally {
         setDisabled(false);
       }
@@ -45,11 +47,16 @@ const BlogEditPage: React.FC = () => {
   const handleSubmit = async (data: BlogUpdateDto) => {
     setIsSubmitting(true);
     try {
-      await updateBlog(blogId, data);
-      toaster.success("Blog updated successfully!"); // Use toaster
-      navigate(`/blogs/${blogId}`); // Redirect to blog detail on success
-    } catch (err: any) {
-      toaster.error(err.message || "Failed to update blog."); // Use toaster
+      if (!initialData?.id) {
+        toaster.error("Blog ID not found for update.");
+        setIsSubmitting(false);
+        return;
+      }
+      await updateBlog(initialData.id, data);
+      toaster.success("Blog updated successfully!");
+      navigate(`/blogs/${initialData.id}`); // Redirect to blog detail on success (assuming a blog detail page exists)
+    } catch (err: unknown) {
+      toaster.error((err as Error).message || "Failed to update blog.");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,10 +64,9 @@ const BlogEditPage: React.FC = () => {
 
   if (disabled) {
     return (
-      <EmptyState
-        title="Loading Blog..."
-        description="Please wait while we fetch the blog details."
-      />
+      <Box display="flex" justifyContent="center" alignItems="center" minH="70vh">
+        <EmptyState title="Loading Blog..." description="Please wait while we fetch the blog details."/>
+      </Box>
     );
   }
 

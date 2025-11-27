@@ -51,3 +51,13 @@ export const deleteBlog = async (id: number) => {
     throw error;
   }
 };
+
+export const getBlogsByAuthor = async (authorId: number) => {
+  try {
+    const response = await get<Blog[]>(`/Blog/author/${authorId}`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching blogs by author with ID ${authorId}:`, error);
+    throw error;
+  }
+};

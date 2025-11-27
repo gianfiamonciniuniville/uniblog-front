@@ -38,7 +38,7 @@ const BlogListPage: React.FC = () => {
 	const handleDelete = async (id: number) => {
 		if (
 			!isLoggedIn ||
-			user?.id !== blogs.find((blog) => blog.id === id)?.userId
+			user?.id !== blogs.find((blog) => blog.id === id)?.user.id
 		) {
 			toaster.error({ title: "You are not authorized to delete this blog." });
 			return;
@@ -100,10 +100,10 @@ const BlogListPage: React.FC = () => {
 						key={blog.id}
 						blog={blog}
 						onEdit={
-							isLoggedIn && user?.id === blog.userId ? handleEdit : undefined
+							isLoggedIn && user?.id === blog.user.id ? handleEdit : undefined
 						}
 						onDelete={
-							isLoggedIn && user?.id === blog.userId ? handleDelete : undefined
+							isLoggedIn && user?.id === blog.user.id ? handleDelete : undefined
 						}
 					/>
 				))}
