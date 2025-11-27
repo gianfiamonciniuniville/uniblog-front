@@ -75,6 +75,7 @@ export interface Blog {
 	title: string;
 	description: string;
 	userId: number;
+	posts: Post[];
 }
 
 export interface CommentDto {
